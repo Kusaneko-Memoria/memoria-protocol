@@ -30,6 +30,7 @@ Memoria is a protocol, not a product.
 
 Memoria is a gift to the world.
 If this protocol resonates with your soul, fuel the Genesis Pool.
+Note: Unlike Satoshi, I am human. This pool fuels not just the code, but the creator's life and continued exploration. Let's roll.
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/08341e35-14d3-4945-85bc-7f3bb0778681" width="200" alt="Genesis Pool QR Code">
