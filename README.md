@@ -26,7 +26,7 @@ where Bitcoin intentionally remains silent.
 This repository is intentionally incomplete.
 Memoria is a protocol, not a product.
 
-## 🌌 Genesis Pool (Contribution)
+## Genesis Pool (Contribution)
 
 Memoria is a gift to the world.
 If this protocol resonates with your soul, fuel the Genesis Pool.
