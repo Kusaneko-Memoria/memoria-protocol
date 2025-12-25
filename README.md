@@ -32,7 +32,8 @@ Memoria is a gift to the world.
 If this protocol resonates with your soul, fuel the Genesis Pool.
 
 <p align="center">
-  <img src="assets/genesis_qr.png" width="200" alt="Genesis Pool QR Code">
+  <img src="![genesis_qr](https://github.com/user-attachments/assets/08341e35-14d3-4945-85bc-7f3bb0778681)
+" width="200" alt="Genesis Pool QR Code">
   <br>
   <br>
   <strong>BTC Address:</strong>
