@@ -15,6 +15,9 @@ where Bitcoin intentionally remains silent.
 ## Repository Contents
 - `paper/`  
   The Memoria protocol paper (Proof of Resonance).
+  
+**DOI:** https://doi.org/10.5281/zenodo.18051826
+
 
 - `implementations/`  
   Reference implementations:
