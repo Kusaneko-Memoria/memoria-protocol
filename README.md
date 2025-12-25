@@ -26,5 +26,19 @@ where Bitcoin intentionally remains silent.
 This repository is intentionally incomplete.
 Memoria is a protocol, not a product.
 
+## 🌌 Genesis Pool (Contribution)
+
+Memoria is a gift to the world.
+If this protocol resonates with your soul, fuel the Genesis Pool.
+
+<p align="center">
+  <img src="assets/genesis_qr.png" width="200" alt="Genesis Pool QR Code">
+  <br>
+  <br>
+  <strong>BTC Address:</strong>
+  <br>
+  <code>bc1qwn0j7yz7qcjlkma79as3teanh73w93fw7zhmra</code>
+</p>
+
 ## License
 MIT License.
