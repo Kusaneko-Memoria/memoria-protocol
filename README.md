@@ -33,6 +33,7 @@ Memoria is a protocol, not a product.
 
 Memoria is a gift to the world.
 If this protocol resonates with your soul, fuel the Genesis Pool.
+
 Note: Unlike Satoshi, I am human. This pool fuels not just the code, but the creator's life and continued exploration. Let's roll.
 
 <p align="center">
