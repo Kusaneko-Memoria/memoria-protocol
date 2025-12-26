@@ -23,6 +23,7 @@ where Bitcoin intentionally remains silent.
 - `implementations/`  
   Reference implementations:
   - v1: single-node, automatic resonance
+    * [📄 Run Memoria v1 (Source Code)](implementations/memoria_v1.html)
   - v2: multi-agent interaction model
   - v4.6.4: social validation and Proof of Resonance thresholding
 
