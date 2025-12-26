@@ -24,6 +24,7 @@ where Bitcoin intentionally remains silent.
   Reference implementations:
   - v1: single-node, automatic resonance
     * [📄 Run Memoria v1 (Source Code)](implementations/memoria_v1.html)
+    * **Launch Memoria v1 (Web)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v1.html)
   - v2: multi-agent interaction model
   - v4.6.4: social validation and Proof of Resonance thresholding
 
