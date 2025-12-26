@@ -13,10 +13,11 @@ Memoria operates orthogonally—addressing semantic persistence
 where Bitcoin intentionally remains silent.
 
 ## Repository Contents
-- `paper/`  
-  The Memoria protocol paper (Proof of Resonance).
-  
-**DOI:** https://doi.org/10.5281/zenodo.18051826
+- `paper/`
+
+- **Title**: Memoria: A Protocol for Post-Hoc Meaning and Resonance  
+- **DOI**: https://doi.org/10.5281/zenodo.18051826  
+- **PDF**:  [Memoria_A_Protocol_for_Post_Hoc_Meaning_and_Resonance.pdf](https://github.com/user-attachments/files/24341699/Memoria_A_Protocol_for_Post_Hoc_Meaning_and_Resonance.pdf)
 
 
 - `implementations/`  
