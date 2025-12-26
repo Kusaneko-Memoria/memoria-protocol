@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Memoria v4.6.4 — Proof of Resonance</title>
+
+<style>
+body { font-family: system-ui, sans-serif; margin: 16px; }
+.card { border:1px solid #ddd; border-radius:12px; padding:12px; margin-bottom:12px; }
+button { padding:8px 12px; border-radius:8px; border:1px solid #ccc; cursor:pointer; }
+.mono { font-family: monospace; font-size:12px; white-space:pre-wrap; }
+.log { max-height:260px; overflow:auto; background:#fafafa; padding:8px; border-radius:8px; }
+.kpi { display:flex; gap:10px; flex-wrap:wrap; }
+.pill { border:1px solid #ddd; border-radius:999px; padding:6px 10px; }
+</style>
+</head>
+
+<body>
+
+<h1>Memoria v4.6.4</h1>
+<h3>Proof of Resonance (Reference Implementation)</h3>
+
+<div class="card">
+<div class="kpi">
+  <div class="pill">Wallet Mass: <b id="wm">0</b></div>
+  <div class="pill">Turn: <b id="turn">0</b></div>
+</div>
+</div>
+
+<div class="card">
+<h3>Actor</h3>
+<button onclick="commitAction()">Commit Action</button>
+<p class="mono" id="actorMsg"></p>
+</div>
+
+<div class="card">
+<h3>Witness</h3>
+<button onclick="resonate()">Attach Resonance</button>
+<p class="mono" id="witMsg"></p>
+</div>
+
+<div class="card">
+<h3>Ledger (Append-only)</h3>
+<div id="ledger" class="log mono"></div>
+</div>
+
+<script>
+let turn = 0;
+let walletMass = 0;
+const ledger = [];
+
+function addTx(tx){
+  ledger.push(tx);
+  render();
+}
+
+function commitAction(){
+  const tx = {
+    type: "ACTION",
+    id: crypto.randomUUID(),
+    turn,
+    note: "Action committed (no intrinsic meaning)"
+  };
+  addTx(tx);
+  document.getElementById("actorMsg").textContent =
+    "Action committed. Meaning undecided.";
+}
+
+function resonate(){
+  const actions = ledger.filter(t => t.type === "ACTION");
+  if(actions.length === 0){
+    document.getElementById("witMsg").textContent =
+      "No actions available to resonate.";
+    return;
+  }
+
+  const target = actions[Math.floor(Math.random()*actions.length)];
+
+  const tx = {
+    type: "RESONANCE",
+    ref: target.id,
+    turn,
+    mass: 1,
+    note: "Resonance attached post-hoc"
+  };
+
+  addTx(tx);
+
+  walletMass += 1;
+  document.getElementById("witMsg").textContent =
+    "Resonance attached. Wallet Mass increased.";
+}
+
+function render(){
+  document.getElementById("wm").textContent = walletMass;
+  document.getElementById("turn").textContent = turn;
+
+  document.getElementById("ledger").textContent =
+    ledger.map(t =>
+      `[${t.type}] t=${t.turn} ${t.note}` +
+      (t.ref ? ` → ref:${t.ref.slice(0,6)}` : "") +
+      (t.mass ? ` (+${t.mass})` : "")
+    ).join("\n");
+
+  turn++;
+}
+</script>
+
+</body>
+</html>
