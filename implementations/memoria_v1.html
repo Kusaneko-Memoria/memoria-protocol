@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Memoria v1.0 — A Toy for Meaning</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin: 16px;
+      background: #ffffff;
+      color: #111;
+    }
+    h1, h2, h3 { margin: 0.4em 0; }
+    .small { font-size: 12px; color: #555; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 12px;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    button {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      background: #fff;
+    }
+    button:hover { background: #f6f6f6; }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 8px 0;
+    }
+    .kpi {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .pill {
+      padding: 6px 10px;
+      border: 1px solid #ddd;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+    .log {
+      max-height: 360px;
+      overflow: auto;
+      background: #fafafa;
+      border: 1px solid #eee;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .sep {
+      height: 1px;
+      background: #eee;
+      margin: 10px 0;
+    }
+    .warn { color: #b45309; }
+    .ok { color: #15803d; }
+  </style>
+</head>
+
+<body>
+
+<h1>Memoria v1.0</h1>
+<h3>A Toy for Meaning & Resonance</h3>
+
+<p class="small">
+Purpose: Experience the difference between <b>non-returning loops</b> and
+<b>returning loops</b> — without explanations.<br>
+Rule: No Free Resonance. Every resonance must reference a prior action.
+Logs are append-only.
+</p>
+
+<div class="grid">
+
+  <!-- LEFT -->
+  <div class="card">
+    <h3>Player State</h3>
+    <div class="kpi">
+      <div class="pill">Balance: <b id="bal">100</b></div>
+      <div class="pill">Commit Mass (CM): <b id="cm">0</b></div>
+      <div class="pill">Resonance Mass (RM): <b id="rm">0</b></div>
+      <div class="pill">Soul Mass (SM): <b id="sm">0</b></div>
+      <div class="pill">Turn: <b id="turn">0</b></div>
+    </div>
+
+    <div class="sep"></div>
+
+    <h3>Actions (One Click)</h3>
+    <div class="row">
+      <button id="btnSub">Subscription Spend<br>(Non-returning)</button>
+      <button id="btnRoll">Nice Roll Spend<br>(Returning)</button>
+      <button id="btnHelp">Help by Action<br>(No Money)</button>
+      <button id="btnNext">Next Turn ▶</button>
+    </div>
+
+    <p class="small warn">
+      Subscription buys comfort, but resonance rarely attaches.<br>
+      Nice Roll costs now, but may open future opportunities.<br>
+      Action without money can still carry meaning.
+    </p>
+
+    <h3>Recent Events</h3>
+    <div class="card mono" id="events">(Nothing has happened yet)</div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="card">
+    <h3>Memoria Ledger (Append-only)</h3>
+    <div class="log mono" id="ledger">(Ledger is empty)</div>
+
+    <div class="sep"></div>
+
+    <h3>How to Play</h3>
+    <ul class="small">
+      <li>Repeat <b>Subscription</b> → feels safe, but drains silently</li>
+      <li>Mix in <b>Nice Roll</b> → resonance may attach later</li>
+      <li><b>Help by Action</b> → no money, still leaves a trace</li>
+      <li>Press <b>Next Turn</b> and wait</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+/*
+  Memoria v1.0
+  Single-player conceptual demo.
+  Not a blockchain.
+  Not a currency.
+  A toy for observing how meaning returns.
+*/
+
+// --- State ---
+const S = {
+  turn: 0,
+  balance: 100,
+  cm: 0,
+  rm: 0,
+  txs: [],
+  lastActionIds: [],
+  lastRollActionIds: []
+};
+
+// --- Utils ---
+function nowISO() { return new Date().toISOString(); }
+function rand() { return Math.random(); }
+
+async function sha256(str) {
+  const enc = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+}
+
+// --- Ledger ---
+async function addTx(tx) {
+  const prev = S.txs.length ? S.txs[S.txs.length - 1].tx_id : "GENESIS";
+  tx.prev_tx_id = prev;
+  const canonical = JSON.stringify(tx);
+  tx.tx_id = await sha256(canonical + "|" + prev);
+  S.txs.push(tx);
+}
+
+// --- UI ---
+function render() {
+  document.getElementById("bal").textContent = S.balance;
+  document.getElementById("cm").textContent = S.cm;
+  document.getElementById("rm").textContent = S.rm;
+  document.getElementById("sm").textContent = S.cm + S.rm;
+  document.getElementById("turn").textContent = S.turn;
+
+  document.getElementById("ledger").textContent =
+    S.txs.slice().reverse().map(tx =>
+      `[${tx.type}] turn=${tx.turn} ${tx.note}`
+    ).join("\n\n") || "(Ledger is empty)";
+}
+
+// --- Actions ---
+async function action(type, note, cost = 0, isRoll = false) {
+  if (S.balance < cost) {
+    alert("Not enough balance.");
+    return;
+  }
+  S.balance -= cost;
+  S.cm += 1;
+
+  const tx = {
+    type: "ACTION",
+    action: type,
+    turn: S.turn,
+    time: nowISO(),
+    note
+  };
+  await addTx(tx);
+
+  S.lastActionIds.push(tx.tx_id);
+  if (isRoll) S.lastRollActionIds.push(tx.tx_id);
+
+  document.getElementById("events").textContent = note;
+  render();
+}
+
+// --- Resonance & Turn ---
+async function nextTurn() {
+  S.turn += 1;
+  let msg = "A quiet turn.";
+
+  const recentRolls = S.lastRollActionIds.slice(-3);
+  const recentAny = S.lastActionIds.slice(-3);
+
+  if (recentRolls.length && rand() < 0.45) {
+    S.rm += 1;
+    msg = "Resonance attached to a Nice Roll.";
+  } else if (recentAny.length && rand() < 0.1) {
+    S.rm += 1;
+    msg = "A small resonance appeared.";
+  }
+
+  if (S.rm > 0 && rand() < Math.min(0.05 + 0.02 * S.rm, 0.4)) {
+    const gain = 2 + Math.floor(rand() * 4);
+    S.balance += gain;
+    msg = `An opportunity returned. (+${gain})`;
+  }
+
+  document.getElementById("events").textContent = msg;
+  render();
+}
+
+// --- Buttons ---
+document.getElementById("btnSub").onclick =
+  () => action("Subscription", "Paid for comfort. Nothing echoes.", 8);
+
+document.getElementById("btnRoll").onclick =
+  () => action("NiceRoll", "Spent without expecting return.", 6, true);
+
+document.getElementById("btnHelp").onclick =
+  () => action("Help", "Acted without money.", 0);
+
+document.getElementById("btnNext").onclick = nextTurn;
+
+// --- Init ---
+(async function init(){
+  await addTx({ type:"GENESIS", turn:0, time:nowISO(), note:"Memoria begins." });
+  render();
+})();
+</script>
+
+</body>
+</html>
