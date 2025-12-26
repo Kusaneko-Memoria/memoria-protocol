@@ -24,10 +24,12 @@ where Bitcoin intentionally remains silent.
   Reference implementations:
   - v1: single-node, automatic resonance
     * [📄 Run Memoria v1 (Source Code)](implementations/memoria_v1.html)
-    * **Launch Memoria v1 (Web)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v1.html)
+* [🔴**Launch Memoria v1 (Web)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v1.html)
   - v2: multi-agent interaction model
+* [🔴 **Launch Memoria v2 (Web)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v2.html)
   - v4.6.4: social validation and Proof of Resonance thresholding
-
+* [🔴 **Launch Memoria v4.6.4 (Web)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v464.html)
+  
 ## Status
 This repository is intentionally incomplete.
 Memoria is a protocol, not a product.
