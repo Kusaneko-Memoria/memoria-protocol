@@ -3,108 +3,375 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Memoria v4.6.4 — Proof of Resonance</title>
+<title>Memoria v4.6.4 — Proof of Resonance (Reference)</title>
 
 <style>
-body { font-family: system-ui, sans-serif; margin: 16px; }
-.card { border:1px solid #ddd; border-radius:12px; padding:12px; margin-bottom:12px; }
-button { padding:8px 12px; border-radius:8px; border:1px solid #ccc; cursor:pointer; }
-.mono { font-family: monospace; font-size:12px; white-space:pre-wrap; }
-.log { max-height:260px; overflow:auto; background:#fafafa; padding:8px; border-radius:8px; }
-.kpi { display:flex; gap:10px; flex-wrap:wrap; }
-.pill { border:1px solid #ddd; border-radius:999px; padding:6px 10px; }
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 16px; line-height: 1.35; }
+  h1,h2,h3 { margin: 0 0 8px; }
+  .small { color:#555; font-size: 12px; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 900px){ .grid { grid-template-columns: 1fr 1fr; } }
+  .card { border:1px solid #ddd; border-radius: 14px; padding: 12px; background: #fff; }
+  .row { display:flex; flex-wrap:wrap; gap: 8px; align-items:center; }
+  button { padding: 10px 12px; border-radius: 10px; border: 1px solid #ccc; cursor:pointer; background:#fff; }
+  button:hover { background:#f6f6f6; }
+  button:disabled { opacity:.55; cursor:not-allowed; }
+  .kpi { display:flex; flex-wrap:wrap; gap: 10px; }
+  .pill { border:1px solid #ddd; border-radius:999px; padding: 6px 10px; background:#fafafa; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; white-space: pre-wrap; }
+  .log { max-height: 320px; overflow:auto; background:#fafafa; border:1px solid #eee; padding: 10px; border-radius: 12px; }
+  .warn { color:#b45309; }
+  .ok { color:#15803d; }
+  .sep { height:1px; background:#eee; margin: 10px 0; }
+  .tag { display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid #ddd; font-size:12px; background:#fff; }
+  input, select {
+    padding: 10px 10px; border-radius: 10px; border:1px solid #ccc; background:#fff;
+    font-family: inherit; font-size: 14px;
+  }
 </style>
 </head>
 
 <body>
 
 <h1>Memoria v4.6.4</h1>
-<h3>Proof of Resonance (Reference Implementation)</h3>
+<h2>Proof of Resonance (Reference Implementation)</h2>
 
-<div class="card">
-<div class="kpi">
-  <div class="pill">Wallet Mass: <b id="wm">0</b></div>
-  <div class="pill">Turn: <b id="turn">0</b></div>
-</div>
-</div>
+<p class="small">
+  This is a toy reference implementation of Memoria’s core idea:
+  <b>Actions are committed without intrinsic meaning</b>, while <b>Resonance attaches post-hoc</b> and determines long-term significance.
+  <br/>
+  Rule: <b>No Free Resonance</b> — every resonance must reference an existing action (append-only ledger).
+</p>
 
-<div class="card">
-<h3>Actor</h3>
-<button onclick="commitAction()">Commit Action</button>
-<p class="mono" id="actorMsg"></p>
-</div>
+<div class="grid">
 
-<div class="card">
-<h3>Witness</h3>
-<button onclick="resonate()">Attach Resonance</button>
-<p class="mono" id="witMsg"></p>
-</div>
+  <div class="card">
+    <h3>State</h3>
+    <div class="kpi">
+      <div class="pill">Turn: <b id="turn">0</b></div>
+      <div class="pill">Actions (A): <b id="nA">0</b></div>
+      <div class="pill">Resonance (R): <b id="nR">0</b></div>
+      <div class="pill">Wallet Mass (WM): <b id="wm">0</b></div>
+      <div class="pill">Threshold (θ): <b id="thetaLabel">3</b></div>
+      <div class="pill">Finalized (PoR): <b id="nF">0</b></div>
+    </div>
 
-<div class="card">
-<h3>Ledger (Append-only)</h3>
-<div id="ledger" class="log mono"></div>
+    <div class="sep"></div>
+
+    <h3>Controls</h3>
+
+    <div class="row">
+      <button id="btnCommit">Commit Action</button>
+      <select id="intent">
+        <option value="NiceRoll">NiceRoll</option>
+        <option value="Subscription">Subscription</option>
+        <option value="HelpByAction">HelpByAction</option>
+      </select>
+      <input id="note" type="text" placeholder="optional note (e.g., 'built a tool')" style="flex:1; min-width: 240px;">
+    </div>
+
+    <div class="row" style="margin-top:8px;">
+      <button id="btnResonate">Attach Resonance</button>
+      <select id="mode">
+        <option value="witness">witness</option>
+        <option value="adoption">adoption</option>
+        <option value="citation">citation</option>
+      </select>
+      <select id="pick">
+        <option value="random">pick: random action</option>
+        <option value="latest">pick: latest action</option>
+      </select>
+      <input id="rm" type="number" min="1" step="1" value="1" style="width:120px;">
+      <span class="small">RM amount</span>
+    </div>
+
+    <div class="row" style="margin-top:8px;">
+      <button id="btnNext">Next Turn ▶</button>
+      <button id="btnFinalize">Run PoR Finalization</button>
+      <label class="small">θ =</label>
+      <input id="theta" type="number" min="1" step="1" value="3" style="width:100px;">
+      <button id="btnReset" title="clears local state">Reset (local)</button>
+    </div>
+
+    <p class="small warn" id="msg"></p>
+
+    <div class="sep"></div>
+
+    <h3>How to feel the protocol (fast)</h3>
+    <ol class="small">
+      <li>Commit a few actions.</li>
+      <li>Attach resonance several times (try different modes).</li>
+      <li>Click <b>Run PoR Finalization</b>. Actions whose RM reaches θ are marked as <b>Finalized</b>.</li>
+      <li>Click <b>Next Turn</b> — the system may auto-witness sometimes (optional noise).</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Ledger (Append-only)</h3>
+    <div class="log mono" id="ledger"></div>
+
+    <div class="sep"></div>
+
+    <h3>Worldline View (Action → attached Resonance → PoR)</h3>
+    <div class="log mono" id="worldline"></div>
+
+    <p class="small">
+      <span class="tag">ACTION</span> committed first (meaning undecided) →
+      <span class="tag">RESONANCE</span> attaches later (must reference an action) →
+      <span class="tag">FINALIZED</span> when RM meets threshold.
+    </p>
+  </div>
+
 </div>
 
 <script>
-let turn = 0;
-let walletMass = 0;
-const ledger = [];
+/* =============================
+   Memoria v4.6.4 (single-file)
+   - Smartphone-safe: no dependency on crypto.randomUUID
+   - No Free Resonance: every resonance must reference an existing ACTION
+   - Append-only local ledger
+   - PoR finalization: finalize actions whose weighted RM >= theta
+   ============================= */
 
+const S = {
+  turn: 0,
+  theta: 3,
+  ledger: [],               // append-only txs
+  wm: 0,                    // wallet mass (sum of rm amounts)
+  finalized: new Set(),     // action_id that passed PoR
+};
+
+// ---------- Utilities ----------
+function makeId(){
+  // Prefer randomUUID when available
+  try {
+    if (crypto && typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  } catch (_) {}
+
+  // Fallback: random bytes
+  try {
+    if (crypto && typeof crypto.getRandomValues === "function") {
+      const a = new Uint8Array(16);
+      crypto.getRandomValues(a);
+      return [...a].map(b => b.toString(16).padStart(2,"0")).join("");
+    }
+  } catch (_) {}
+
+  // Last resort: time + Math.random (works everywhere)
+  return "id_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2);
+}
+
+function nowISO(){
+  try { return new Date().toISOString(); }
+  catch(_) { return "" + Date.now(); }
+}
+
+function setMsg(text, kind){
+  const el = document.getElementById("msg");
+  el.textContent = text || "";
+  el.className = "small " + (kind === "ok" ? "ok" : (kind === "warn" ? "warn" : ""));
+}
+
+function count(type){
+  return S.ledger.filter(x => x.type === type).length;
+}
+
+function actions(){
+  return S.ledger.filter(x => x.type === "ACTION");
+}
+
+function resonances(){
+  return S.ledger.filter(x => x.type === "RESONANCE");
+}
+
+// Weighted RM for an action_id
+function rmFor(actionId){
+  const rs = resonances().filter(r => r.ref === actionId);
+  let sum = 0;
+  for (const r of rs){
+    // Simple weight function by mode (toy)
+    const w = (r.mode === "citation") ? 2 : (r.mode === "adoption") ? 1.5 : 1;
+    sum += w * (r.rm || 0);
+  }
+  return sum;
+}
+
+// ---------- Append-only addTx ----------
 function addTx(tx){
-  ledger.push(tx);
+  // append-only
+  S.ledger.push(tx);
   render();
 }
 
+// ---------- Actions ----------
 function commitAction(){
+  const intent = document.getElementById("intent").value;
+  const note = (document.getElementById("note").value || "").trim();
+
   const tx = {
     type: "ACTION",
-    id: crypto.randomUUID(),
-    turn,
-    note: "Action committed (no intrinsic meaning)"
+    id: makeId(),
+    turn: S.turn,
+    ts: nowISO(),
+    intent,
+    note: note || "Action committed (meaning undecided)"
   };
+
   addTx(tx);
-  document.getElementById("actorMsg").textContent =
-    "Action committed. Meaning undecided.";
+  setMsg("Action committed. Meaning is undecided until resonance attaches.", "ok");
 }
 
-function resonate(){
-  const actions = ledger.filter(t => t.type === "ACTION");
-  if(actions.length === 0){
-    document.getElementById("witMsg").textContent =
-      "No actions available to resonate.";
+function attachResonance(){
+  const as = actions();
+  if (as.length === 0){
+    setMsg("No Free Resonance: you must commit at least one action first.", "warn");
     return;
   }
 
-  const target = actions[Math.floor(Math.random()*actions.length)];
+  const mode = document.getElementById("mode").value;
+  const pick = document.getElementById("pick").value;
+  const rm = Math.max(1, parseInt(document.getElementById("rm").value || "1", 10));
+
+  const target = (pick === "latest")
+    ? as[as.length - 1]
+    : as[Math.floor(Math.random() * as.length)];
 
   const tx = {
     type: "RESONANCE",
-    ref: target.id,
-    turn,
-    mass: 1,
-    note: "Resonance attached post-hoc"
+    id: makeId(),
+    ref: target.id,      // No Free Resonance: MUST reference an action
+    turn: S.turn,
+    ts: nowISO(),
+    mode,
+    rm,
+    note: `Resonance attached post-hoc (${mode})`
   };
 
   addTx(tx);
-
-  walletMass += 1;
-  document.getElementById("witMsg").textContent =
-    "Resonance attached. Wallet Mass increased.";
+  S.wm += rm;
+  setMsg(`Resonance attached to ACTION ${target.id.slice(0,8)}… (+WM ${rm}).`, "ok");
 }
 
+function runFinalization(){
+  S.theta = Math.max(1, parseInt(document.getElementById("theta").value || "3", 10));
+
+  const as = actions();
+  if (as.length === 0){
+    setMsg("No actions to finalize yet.", "warn");
+    render();
+    return;
+  }
+
+  let newly = 0;
+  for (const a of as){
+    const score = rmFor(a.id);
+    if (score >= S.theta && !S.finalized.has(a.id)){
+      S.finalized.add(a.id);
+      newly++;
+      // record finalization event as a TX (still append-only)
+      addTx({
+        type: "FINALIZED",
+        id: makeId(),
+        ref: a.id,
+        turn: S.turn,
+        ts: nowISO(),
+        note: `PoR finalization: RM>=θ (${score.toFixed(2)} >= ${S.theta})`
+      });
+    }
+  }
+
+  if (newly === 0) setMsg("No new finalizations. Add more resonance or lower θ.", "warn");
+  else setMsg(`Finalized ${newly} action(s) via PoR.`, "ok");
+
+  render();
+}
+
+function nextTurn(){
+  S.turn += 1;
+
+  // Optional: small chance of auto-witnessing (toy noise)
+  const as = actions();
+  if (as.length && Math.random() < 0.20){
+    const target = as[Math.floor(Math.random() * as.length)];
+    addTx({
+      type: "RESONANCE",
+      id: makeId(),
+      ref: target.id,
+      turn: S.turn,
+      ts: nowISO(),
+      mode: "witness",
+      rm: 1,
+      note: "Auto-witness resonance (toy)"
+    });
+    S.wm += 1;
+    setMsg("Auto-witness occurred this turn (+RM1).", "ok");
+  } else {
+    setMsg("Quiet turn. The ledger still persists.", "");
+    render();
+  }
+}
+
+function resetLocal(){
+  if (!confirm("Reset local state? (This clears the toy ledger in this tab.)")) return;
+  S.turn = 0;
+  S.theta = 3;
+  S.ledger = [];
+  S.wm = 0;
+  S.finalized = new Set();
+  setMsg("Reset complete.", "");
+  render();
+}
+
+// ---------- Render ----------
 function render(){
-  document.getElementById("wm").textContent = walletMass;
-  document.getElementById("turn").textContent = turn;
+  document.getElementById("turn").textContent = S.turn;
+  document.getElementById("nA").textContent = count("ACTION");
+  document.getElementById("nR").textContent = count("RESONANCE");
+  document.getElementById("wm").textContent = S.wm;
+  document.getElementById("thetaLabel").textContent = S.theta;
+  document.getElementById("nF").textContent = S.finalized.size;
 
-  document.getElementById("ledger").textContent =
-    ledger.map(t =>
-      `[${t.type}] t=${t.turn} ${t.note}` +
-      (t.ref ? ` → ref:${t.ref.slice(0,6)}` : "") +
-      (t.mass ? ` (+${t.mass})` : "")
-    ).join("\n");
+  // Ledger view (latest first)
+  const lines = [...S.ledger].slice().reverse().map(tx => {
+    const head = `[${tx.type}] t=${tx.turn} ${tx.ts || ""}`;
+    const body =
+      (tx.type === "ACTION")
+        ? ` id=${(tx.id||"").slice(0,10)} intent=${tx.intent} note="${tx.note}"`
+        : (tx.type === "RESONANCE")
+          ? ` id=${(tx.id||"").slice(0,10)} ref=${(tx.ref||"").slice(0,10)} mode=${tx.mode} rm=${tx.rm} note="${tx.note}"`
+          : ` id=${(tx.id||"").slice(0,10)} ref=${(tx.ref||"").slice(0,10)} note="${tx.note}"`;
+    return head + "\n" + body;
+  }).join("\n\n");
 
-  turn++;
+  document.getElementById("ledger").textContent = lines || "(empty ledger)";
+
+  // Worldline view: list actions with attached resonance and finalization state
+  const as = actions();
+  const wl = as.slice().reverse().slice(0, 20).map(a => {
+    const rs = resonances().filter(r => r.ref === a.id);
+    const score = rmFor(a.id);
+    const fin = S.finalized.has(a.id) ? "FINALIZED ✅" : "pending …";
+    const rLines = rs.slice(-8).map(r => `  ↳ R (${r.mode}) +${r.rm}  [${r.id.slice(0,8)}…]`).join("\n");
+    return [
+      `A ${a.id.slice(0,10)}…  intent=${a.intent}  score=${score.toFixed(2)}  θ=${S.theta}  → ${fin}`,
+      `  note="${a.note}"`,
+      rLines || "  ↳ (no resonance yet)"
+    ].join("\n");
+  }).join("\n\n");
+
+  document.getElementById("worldline").textContent = wl || "(no actions yet)";
 }
+
+// ---------- Wire buttons ----------
+document.getElementById("btnCommit").addEventListener("click", commitAction);
+document.getElementById("btnResonate").addEventListener("click", attachResonance);
+document.getElementById("btnFinalize").addEventListener("click", runFinalization);
+document.getElementById("btnNext").addEventListener("click", nextTurn);
+document.getElementById("btnReset").addEventListener("click", resetLocal);
+
+// Init
+render();
+setMsg("Ready. Commit an action to start.", "");
 </script>
 
 </body>
