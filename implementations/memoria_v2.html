@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Memoria v2.0 — Witness & Resonance</title>
+<style>
+body {
+  font-family: system-ui, sans-serif;
+  margin: 16px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.card {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 12px;
+}
+button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+.mono {
+  font-family: monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+.log {
+  max-height: 280px;
+  overflow: auto;
+  background: #fafafa;
+  border: 1px solid #eee;
+  padding: 8px;
+  border-radius: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Memoria v2.0</h1>
+<h3>Witness-Based Resonance Demo</h3>
+<p class="mono">
+Action has no meaning at creation.
+Meaning emerges only if witnessed later.
+</p>
+
+<div class="grid">
+
+<div class="card">
+<h3>Actor (You)</h3>
+<button onclick="createAction()">Commit Action</button>
+<p id="actorMsg" class="mono"></p>
+</div>
+
+<div class="card">
+<h3>Witness (Simulated)</h3>
+<button onclick="witness()">Witness Random Action</button>
+<p id="witMsg" class="mono"></p>
+</div>
+
+</div>
+
+<div class="card">
+<h3>Ledger (Append-only)</h3>
+<div id="ledger" class="log mono"></div>
+</div>
+
+<script>
+const ledger = [];
+let turn = 0;
+
+function addTx(tx){
+  ledger.push(tx);
+  render();
+}
+
+function createAction(){
+  const tx = {
+    type: "ACTION",
+    id: crypto.randomUUID(),
+    turn,
+    note: "Action committed without validation"
+  };
+  addTx(tx);
+  document.getElementById("actorMsg").textContent =
+    "You acted. Meaning undecided.";
+}
+
+function witness(){
+  const actions = ledger.filter(t => t.type === "ACTION");
+  if(actions.length === 0){
+    document.getElementById("witMsg").textContent =
+      "Nothing to witness.";
+    return;
+  }
+  const target = actions[Math.floor(Math.random()*actions.length)];
+  const tx = {
+    type: "RESONANCE",
+    ref: target.id,
+    turn,
+    note: "Witness referenced a past action"
+  };
+  addTx(tx);
+  document.getElementById("witMsg").textContent =
+    "A past action was witnessed.";
+}
+
+function render(){
+  document.getElementById("ledger").textContent =
+    ledger.map(t =>
+      `[${t.type}] t=${t.turn} ${t.note}` +
+      (t.ref ? ` → ref:${t.ref.slice(0,6)}` : "")
+    ).join("\n");
+  turn++;
+}
+</script>
+
+</body>
+</html>
