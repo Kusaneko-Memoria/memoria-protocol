@@ -34,7 +34,7 @@ where Bitcoin intentionally remains silent.
    
   - Sybil Resistance: Anti Spam
     * [📄 Run Memoria Sybil Resistance (Source Code)](implementations/memoria_sybil_resistance.html)
-    * [🔴 **Launch Memoria Sybil Resistance (Web)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_sybil_ressistance.html)
+    * [🔴 **Launch Memoria Sybil Resistance (Web)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_sybil_resistance.html)
   
 ## Status
 This repository is intentionally incomplete.
