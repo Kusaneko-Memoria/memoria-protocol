@@ -29,6 +29,7 @@ where Bitcoin intentionally remains silent.
     * [📄 Run Memoria v2 (Source Code)](implementations/memoria_v2.html)
     * [🔴 **Launch Memoria v2 (Web)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v2.html)
   - v4.6.4: social validation and Proof of Resonance thresholding
+    * [📄 Run Memoria v4.6.4 (Source Code)](implementations/memoria_v464.html)
     * [🔴 **Launch Memoria v4.6.4 (Web)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v464.html)
   
 ## Status
