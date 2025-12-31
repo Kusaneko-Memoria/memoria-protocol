@@ -31,6 +31,10 @@ where Bitcoin intentionally remains silent.
   - v4.6.4: social validation and Proof of Resonance thresholding
     * [📄 Run Memoria v4.6.4 (Source Code)](implementations/memoria_v464.html)
     * [🔴 **Launch Memoria v4.6.4 (Web)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v464.html)
+   
+  - Sybil Resistance: Anti Spam
+    * [📄 Run Memoria Sybil Resistance (Source Code)](implementations/memoria_sybil_resistance.html)
+    * [🔴 **Launch Memoria Sybil Resistance (Web)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_sybil_ressistance.html)
   
 ## Status
 This repository is intentionally incomplete.
