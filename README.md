@@ -30,7 +30,7 @@ Now, introduce a second observer in a simulation.
 **"Meaning requires Friction."**
 Move the ledger physically between two real devices.
 * **What to learn:** Experience **"Worldline Convergence."** Export the ledger from Device A, send it to Device B, witness it, and merge it back. Prove that "Truth" is not on a server, but in the file you hold.
-* [🔴 **Launch v2.1 (Two-Device)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v2_1.html)
+* [🔴 **Launch v2.1 (Two-Device)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v2.1.html)
 * [📖 **Read the v2.1 Playbook**](./PLAYBOOK_v2.1.md)
 
 ### **Step 4: The Society (v4.6.4)**
