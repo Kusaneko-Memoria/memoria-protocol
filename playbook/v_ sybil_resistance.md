@@ -1,5 +1,5 @@
 # Memoria — “Spam exists, but can’t climb.” (PoR Toy)
-## Anti-Spam Version — Playbook (Complete, Code-Accurate)
+## Sybil Resistance — Playbook (Complete, Code-Accurate)
 
 ## 0) What this demo is
 This single-file toy demonstrates a reproducible separation:
