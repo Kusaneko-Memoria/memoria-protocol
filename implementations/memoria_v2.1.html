@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Memoria v2.1 — Two-Device Witness (1-file)</title>
+<style>
+  :root { --fg:#111; --muted:#666; --line:#e8e8e8; --soft:#fafafa; --ok:#15803d; --warn:#b45309; }
+  body { font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif; margin:16px; color:var(--fg); line-height:1.35; }
+  h1,h2,h3 { margin:.2em 0 .4em; }
+  .small { font-size:12px; color:var(--muted); }
+  .grid { display:grid; grid-template-columns: 1fr; gap:12px; }
+  @media (min-width: 950px){ .grid { grid-template-columns: 1.05fr 1fr; } }
+  .card { border:1px solid var(--line); border-radius:14px; padding:12px; background:#fff; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  button { padding:10px 12px; border-radius:10px; border:1px solid #ccc; background:#fff; cursor:pointer; }
+  button:hover { background:#f6f6f6; }
+  button:disabled { opacity:.55; cursor:not-allowed; }
+  input, textarea, select { padding:10px; border-radius:10px; border:1px solid #ccc; background:#fff; font-size:14px; font-family: inherit; }
+  textarea { width:100%; min-height:120px; resize:vertical; }
+  .mono { font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; white-space:pre-wrap; }
+  .log { max-height:360px; overflow:auto; background:var(--soft); border:1px solid #eee; padding:10px; border-radius:12px; }
+  .kpi { display:flex; flex-wrap:wrap; gap:8px; }
+  .pill { border:1px solid var(--line); border-radius:999px; padding:6px 10px; background:var(--soft); font-size:13px; }
+  .sep { height:1px; background:var(--line); margin:10px 0; }
+  .ok { color:var(--ok); }
+  .warn { color:var(--warn); }
+  .tag { display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--line); font-size:12px; background:#fff; }
+</style>
+</head>
+<body>
+
+<h1>Memoria v2.1</h1>
+<h2>Two-Device Witness Demo (Append-only / Copy-Paste Ledger)</h2>
+<p class="small">
+<b>Goal:</b> ACTION is free to exist. Meaning emerges only when a <b>separate device</b> later appends RESONANCE that references the ACTION id.
+<br/><b>Rules:</b> (1) Append-only ledger (no edits). (2) <b>No Free Resonance</b>: every RESONANCE must reference an existing ACTION.
+</p>
+
+<div class="grid">
+
+  <!-- LEFT: Controls -->
+  <div class="card">
+    <h3>State</h3>
+    <div class="kpi">
+      <div class="pill">Turn: <b id="turn">0</b></div>
+      <div class="pill">Actions: <b id="nA">0</b></div>
+      <div class="pill">Resonances: <b id="nR">0</b></div>
+      <div class="pill">Device role: <b id="roleLabel">Actor</b></div>
+    </div>
+
+    <div class="sep"></div>
+
+    <h3>Role (optional)</h3>
+    <div class="row">
+      <select id="role">
+        <option value="actor" selected>Actor (Device A)</option>
+        <option value="witness">Witness (Device B)</option>
+      </select>
+      <span class="small">This only changes UI hints. The ledger is the truth.</span>
+    </div>
+
+    <div class="sep"></div>
+
+    <h3>Actor</h3>
+    <div class="row">
+      <input id="actionNote" placeholder="optional action note (e.g., 'built a tiny demo')" style="flex:1; min-width:260px;">
+      <button id="btnAction">Commit ACTION</button>
+    </div>
+    <p class="small">
+      After committing: <span class="tag">ACTION</span> exists, but meaning is <b>undecided</b>.
+    </p>
+
+    <div class="sep"></div>
+
+    <h3>Witness</h3>
+    <div class="row">
+      <select id="pick">
+        <option value="random" selected>pick: random action</option>
+        <option value="latest">pick: latest action</option>
+      </select>
+      <input id="resNote" placeholder="optional resonance note (e.g., 'I reference this')" style="flex:1; min-width:220px;">
+      <button id="btnRes">Attach RESONANCE</button>
+    </div>
+    <p class="small">
+      <b>No Free Resonance:</b> RESONANCE must reference an existing ACTION id.
+    </p>
+
+    <div class="sep"></div>
+
+    <h3>Export / Import (copy-paste between devices)</h3>
+
+    <div class="row">
+      <button id="btnExport">Export Ledger → Clipboard</button>
+      <button id="btnExportBox">Export Ledger → Box</button>
+      <button id="btnClearBox" title="clears the box only">Clear Box</button>
+    </div>
+
+    <textarea id="box" class="mono" placeholder="Paste ledger here to import, or export into this box..."></textarea>
+
+    <div class="row" style="margin-top:8px;">
+      <button id="btnImportReplace" title="Replace local state with pasted ledger">Import (Replace)</button>
+      <button id="btnImportMerge" title="Merge pasted ledger by tx.id (append-only)">Import (Merge)</button>
+      <button id="btnReset" title="Reset local toy state in this tab">Reset (local)</button>
+    </div>
+
+    <p id="msg" class="small"></p>
+
+    <div class="sep"></div>
+
+    <h3>Fast Two-Device Recipe</h3>
+    <ol class="small">
+      <li><b>Device A:</b> Commit 1–3 ACTIONs → Export ledger.</li>
+      <li>Send exported text to <b>Device B</b> (chat/email/QR).</li>
+      <li><b>Device B:</b> Import ledger → Attach RESONANCE → Export ledger.</li>
+      <li>Send back to <b>Device A</b> → Import → observe post-hoc meaning.</li>
+    </ol>
+  </div>
+
+  <!-- RIGHT: Ledger views -->
+  <div class="card">
+    <h3>Ledger (append-only)</h3>
+    <div id="ledger" class="log mono">(empty)</div>
+
+    <div class="sep"></div>
+
+    <h3>Worldline (ACTION → attached RESONANCE)</h3>
+    <div id="worldline" class="log mono">(no actions yet)</div>
+
+    <p class="small">
+      <span class="tag">ACTION</span> is permissionless →
+      <span class="tag">RESONANCE</span> references later →
+      meaning is a property of <b>time + independent witness</b>.
+    </p>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+ Memoria v2.1 — Two-Device Witness (single-file)
+ - Append-only ledger (toy; local state)
+ - No Free Resonance: RESONANCE must reference existing ACTION id
+ - Export/import via copy-paste (for 2-device demo)
+ ========================================================= */
+
+const S = {
+  turn: 0,
+  ledger: [],          // append-only txs
+};
+
+// ---------- Utilities ----------
+function makeId(){
+  try { if (crypto && typeof crypto.randomUUID === "function") return crypto.randomUUID(); } catch(_) {}
+  try{
+    if (crypto && typeof crypto.getRandomValues === "function"){
+      const a = new Uint8Array(16); crypto.getRandomValues(a);
+      return [...a].map(b=>b.toString(16).padStart(2,"0")).join("");
+    }
+  }catch(_){}
+  return "id_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2);
+}
+function nowISO(){ try { return new Date().toISOString(); } catch(_) { return ""+Date.now(); } }
+
+function setMsg(text, kind){
+  const el = document.getElementById("msg");
+  el.textContent = text || "";
+  el.className = "small " + (kind==="ok" ? "ok" : (kind==="warn" ? "warn" : ""));
+}
+
+function actions(){ return S.ledger.filter(x=>x.type==="ACTION"); }
+function resonances(){ return S.ledger.filter(x=>x.type==="RESONANCE"); }
+
+function count(type){ return S.ledger.filter(x=>x.type===type).length; }
+
+function canonicalExport(){
+  // Export the ledger as JSON Lines (one tx per line).
+  // Reason: stable for copy/paste and merge by tx.id.
+  return S.ledger.map(tx => JSON.stringify(tx)).join("\n");
+}
+
+function parseImport(text){
+  const raw = (text || "").trim();
+  if (!raw) return [];
+  // Accept JSON Lines or a JSON array
+  if (raw.startsWith("[")){
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) throw new Error("JSON is not an array.");
+    return arr;
+  }
+  const lines = raw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  return lines.map(line => JSON.parse(line));
+}
+
+function validateTx(tx){
+  if (!tx || typeof tx !== "object") return "Invalid tx object.";
+  if (!tx.type || typeof tx.type !== "string") return "Missing tx.type.";
+  if (!tx.id || typeof tx.id !== "string") return "Missing tx.id.";
+  if (typeof tx.turn !== "number") return "Missing tx.turn (number).";
+  if (!tx.ts || typeof tx.ts !== "string") return "Missing tx.ts (string).";
+
+  if (tx.type === "ACTION"){
+    return null;
+  }
+  if (tx.type === "RESONANCE"){
+    if (!tx.ref || typeof tx.ref !== "string") return "RESONANCE missing ref (ACTION id).";
+    return null;
+  }
+  if (tx.type === "GENESIS"){
+    return null;
+  }
+  return "Unknown tx.type: " + tx.type;
+}
+
+// ---------- Append-only addTx ----------
+function addTx(tx){
+  S.ledger.push(tx);
+  render();
+}
+
+// ---------- Actions ----------
+function commitAction(){
+  const note = (document.getElementById("actionNote").value || "").trim();
+  addTx({
+    type: "ACTION",
+    id: makeId(),
+    turn: S.turn,
+    ts: nowISO(),
+    note: note || "Action committed without intrinsic meaning"
+  });
+  setMsg("ACTION committed. Meaning is undecided until a witness references it later.", "ok");
+}
+
+function attachResonance(){
+  const as = actions();
+  if (!as.length){
+    setMsg("No Free Resonance: commit at least one ACTION first (or import a ledger that has actions).", "warn");
+    return;
+  }
+
+  const pick = document.getElementById("pick").value;
+  const target = (pick === "latest") ? as[as.length - 1] : as[Math.floor(Math.random() * as.length)];
+  const note = (document.getElementById("resNote").value || "").trim();
+
+  addTx({
+    type: "RESONANCE",
+    id: makeId(),
+    ref: target.id,
+    turn: S.turn,
+    ts: nowISO(),
+    note: note || "Witness referenced a past action"
+  });
+
+  setMsg(`RESONANCE attached → ref:${target.id.slice(0,8)}… (post-hoc meaning).`, "ok");
+}
+
+// ---------- Export / Import ----------
+async function exportClipboard(){
+  const text = canonicalExport();
+  try{
+    await navigator.clipboard.writeText(text);
+    setMsg("Ledger exported to clipboard. Paste it into Device B.", "ok");
+  }catch(e){
+    setMsg("Clipboard blocked by browser. Use 'Export Ledger → Box' and copy manually.", "warn");
+  }
+}
+
+function exportToBox(){
+  document.getElementById("box").value = canonicalExport();
+  setMsg("Ledger exported to the box. Copy and send it to the other device.", "ok");
+}
+
+function clearBox(){
+  document.getElementById("box").value = "";
+  setMsg("Box cleared.", "");
+}
+
+function importReplace(){
+  const text = document.getElementById("box").value;
+  let txs = [];
+  try{
+    txs = parseImport(text);
+  }catch(e){
+    setMsg("Import failed: invalid JSON / JSONL. (" + e.message + ")", "warn");
+    return;
+  }
+
+  // Validate and No Free Resonance check relative to imported set
+  const ids = new Set(txs.map(t=>t && t.id).filter(Boolean));
+  for (const tx of txs){
+    const err = validateTx(tx);
+    if (err){ setMsg("Import failed: " + err, "warn"); return; }
+  }
+  for (const tx of txs){
+    if (tx.type === "RESONANCE" && !ids.has(tx.ref)){
+      setMsg("Import failed: RESONANCE ref points to missing ACTION id (" + tx.ref + ").", "warn");
+      return;
+    }
+  }
+
+  // Replace local state
+  S.ledger = txs.slice();
+  // Recompute turn as 1 + max turn seen (toy)
+  S.turn = Math.max(0, ...S.ledger.map(t=>t.turn)) + 1;
+
+  setMsg("Imported (Replace). Local state is now the pasted ledger.", "ok");
+  render();
+}
+
+function importMerge(){
+  const text = document.getElementById("box").value;
+  let txs = [];
+  try{
+    txs = parseImport(text);
+  }catch(e){
+    setMsg("Import failed: invalid JSON / JSONL. (" + e.message + ")", "warn");
+    return;
+  }
+
+  // Validate
+  for (const tx of txs){
+    const err = validateTx(tx);
+    if (err){ setMsg("Import failed: " + err, "warn"); return; }
+  }
+
+  // Merge by tx.id (append-only semantics)
+  const have = new Set(S.ledger.map(t=>t.id));
+  const combined = S.ledger.slice();
+
+  // We'll tentatively add, then enforce No Free Resonance relative to combined
+  for (const tx of txs){
+    if (!have.has(tx.id)){
+      combined.push(tx);
+      have.add(tx.id);
+    }
+  }
+
+  // No Free Resonance check relative to merged set
+  const ids = new Set(combined.map(t=>t.id));
+  for (const tx of combined){
+    if (tx.type === "RESONANCE" && !ids.has(tx.ref)){
+      setMsg("Merge failed: RESONANCE ref points to missing ACTION id (" + tx.ref + ").", "warn");
+      return;
+    }
+  }
+
+  // Commit merged
+  S.ledger = combined;
+  S.turn = Math.max(0, ...S.ledger.map(t=>t.turn)) + 1;
+
+  setMsg("Imported (Merge). New txs appended (deduped by tx.id).", "ok");
+  render();
+}
+
+function resetLocal(){
+  if (!confirm("Reset local state? (Clears ledger in this tab.)")) return;
+  S.turn = 0;
+  S.ledger = [];
+  setMsg("Reset complete.", "");
+  render();
+}
+
+// ---------- Render ----------
+function render(){
+  document.getElementById("turn").textContent = S.turn;
+  document.getElementById("nA").textContent = count("ACTION");
+  document.getElementById("nR").textContent = count("RESONANCE");
+  document.getElementById("roleLabel").textContent =
+    (document.getElementById("role").value === "witness") ? "Witness" : "Actor";
+
+  // Ledger view (latest first)
+  const lines = S.ledger.slice().reverse().map(tx => {
+    if (tx.type === "ACTION"){
+      return `[ACTION]   t=${tx.turn} ${tx.ts} id=${tx.id.slice(0,10)}… note="${tx.note}"`;
+    }
+    if (tx.type === "RESONANCE"){
+      return `[RESONANCE] t=${tx.turn} ${tx.ts} id=${tx.id.slice(0,10)}… ref=${tx.ref.slice(0,10)}… note="${tx.note}"`;
+    }
+    return `[${tx.type}] t=${tx.turn} ${tx.ts} id=${(tx.id||"").slice(0,10)}…`;
+  }).join("\n");
+  document.getElementById("ledger").textContent = lines || "(empty)";
+
+  // Worldline view: each action with resonance count
+  const as = actions().slice().reverse().slice(0, 30);
+  const rs = resonances();
+  const wl = as.map(a => {
+    const attached = rs.filter(r => r.ref === a.id);
+    const head = `A ${a.id.slice(0,10)}…  t=${a.turn}  resonances=${attached.length}`;
+    const notes = `  note="${a.note}"`;
+    const rLines = attached.slice(-8).map(r =>
+      `  ↳ R ${r.id.slice(0,8)}…  t=${r.turn}  note="${r.note}"`
+    ).join("\n") || "  ↳ (no resonance yet)";
+    return [head, notes, rLines].join("\n");
+  }).join("\n\n");
+  document.getElementById("worldline").textContent = wl || "(no actions yet)";
+
+  // Turns: in v2.1, we increment turn on each render (toy), to keep “time” moving
+  S.turn += 1;
+}
+
+// ---------- Wire ----------
+document.getElementById("btnAction").addEventListener("click", commitAction);
+document.getElementById("btnRes").addEventListener("click", attachResonance);
+
+document.getElementById("btnExport").addEventListener("click", exportClipboard);
+document.getElementById("btnExportBox").addEventListener("click", exportToBox);
+document.getElementById("btnClearBox").addEventListener("click", clearBox);
+
+document.getElementById("btnImportReplace").addEventListener("click", importReplace);
+document.getElementById("btnImportMerge").addEventListener("click", importMerge);
+
+document.getElementById("btnReset").addEventListener("click", resetLocal);
+
+document.getElementById("role").addEventListener("change", ()=>render());
+
+// ---------- Init ----------
+(function init(){
+  // Optional GENESIS helps readers
+  addTx({ type:"GENESIS", id: makeId(), turn: 0, ts: nowISO(), note:"Memoria begins (v2.1 two-device witness)." });
+  setMsg("Ready. Device A commits ACTION → export → Device B witnesses → export → import back.", "");
+})();
+</script>
+
+</body>
+</html>
+```0
