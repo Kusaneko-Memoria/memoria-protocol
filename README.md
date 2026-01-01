@@ -46,8 +46,7 @@ Introduce the concept of social consensus.
 **"Meaning requires Mass."**
 The culmination of everything above.
 * **What to learn:** Face the reality of the adversarial Web. Spawn 50 spam bots. Watch them scream in the void. See how **Wallet Mass (WM)** protects the signal from the noise.
-* [🔴 **Launch Sybil Resistance Toy (Full Model)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_sybil_resistance.html)
-* [📄 Source Code](implementations/memoria_sybil_resistance.html)
+* [🔴 **Launch Sybil Resistance Toy (Full Model)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_sybil_resistance.html)| [Source](implementations/memoria_sybil_resistance.html)
 * [📖 **Read the Sybil Resistance Playbook**](playbook/sybil_resistance.md)
 
 ---
