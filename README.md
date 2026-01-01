@@ -19,20 +19,20 @@ Each version isolates a specific truth about the nature of meaning.
 Start here. Experience the solitude of a single node.
 * **What to learn:** See how immediate actions (spending) and delayed returns (meaning) diverge over time. Realize that meaning is not instant.
 * [🔴 **Launch v1 (Single Node)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v1.html) | [Source](implementations/memoria_v1.html)
-* [📖 **Read the v1 Playbook**](playbook/v1.0.md) 
+* [📖 **Read the v1 Playbook**](playbook/v1.0.md)
 
 ### **Step 2: The Witness (v2.0)**
 **"Meaning requires Others."**
 Now, introduce a second observer in a simulation.
 * **What to learn:** You cannot resonate with yourself. See how "meaning" only emerges when an external Witness references your Action. The graph begins to connect.
 * [🔴 **Launch v2 (Multi-Agent)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v2.html) | [Source](implementations/memoria_v2.html)
-* [📖 **Read the v2 Playbook**](playbook/v2.0.md) 
+* [📖 **Read the v2 Playbook**](playbook/v2.0.md)
 
 ### **Step 3: The Transfer (v2.1)**
 **"Meaning requires Friction."**
 Move the ledger physically between two real devices.
 * **What to learn:** Experience **"Worldline Convergence."** Export the ledger from Device A, send it to Device B, witness it, and merge it back. Prove that "Truth" is not on a server, but in the file you hold.
-* [🔴 **Launch v2.1 (Two-Device)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v2.1.html)| [Source](implementations/memoria_v2.1.html)
+* [🔴 **Launch v2.1 (Two-Device)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v2.1.html) | [Source](implementations/memoria_v2.1.html)
 * [📖 **Read the v2.1 Playbook**](playbook/v2.1.md)
 
 ### **Step 4: The Society (v4.6.4)**
@@ -40,7 +40,7 @@ Move the ledger physically between two real devices.
 Introduce the concept of social consensus.
 * **What to learn:** Not all resonance is equal. Experience how **Proof of Resonance (PoR)** filters the noise and lifts only the "heaviest" meaning into the finalized layer.
 * [🔴 **Launch v4.6.4 (Social Validation)**](https://kusaneko-memoria.github.io/memoria-protocol/implementations/memoria_v464.html) | [Source](implementations/memoria_v464.html)
-* [📖 **Read the v4.6.4 Playbook**](playbook/v464.md)  
+* [📖 **Read the v4.6.4 Playbook**](playbook/v464.md)
 
 ### **Final Step: The Fortress (Sybil Resistance)**
 **"Meaning requires Mass."**
